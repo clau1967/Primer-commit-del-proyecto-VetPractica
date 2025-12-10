@@ -1,0 +1,20 @@
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Configuración de IDEs
+.vscode/
+.idea/
+
+# Archivos de log
+*.log
+
+# Configuración local de PHP o MySQL
+config.php
+*.env
+
+# Carpeta de dependencias (si usas Composer o NPM)
+vendor/
+node_modules/
+
+

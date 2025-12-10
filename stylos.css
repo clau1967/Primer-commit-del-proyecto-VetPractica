@@ -1,0 +1,133 @@
+/* ======== GENERAL ======== */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f9f9f9;
+}
+
+/* ======== HEADER ======== */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #ffeb80; /* amarillo claro */
+    padding: 10px 20px;
+    border-bottom: 2px solid #d4c04e;
+}
+
+.logo-pequeno {
+    width: 70px;
+    height: auto;
+    margin-right: 15px;
+}
+
+/* Contenedor título + menú */
+.header-contenido {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 26px;
+    color: #333;
+}
+
+/* ======== MENÚ ======== */
+.menu {
+    display: flex;
+    gap: 15px;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    padding: 6px 10px;
+    border-radius: 5px;
+}
+
+.menu a:hover {
+    background: #fff7c2;
+}
+
+/* ======== TABLAS ======== */
+table {
+    width: 95%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: white;
+}
+
+table th, table td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+table th {
+    background: #ffe66d;
+}
+
+/* ======== BOTONES ======== */
+.btn {
+    padding: 7px 12px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-azul {
+    background: #007bff;
+}
+
+.btn-azul:hover {
+    background: #0056b3;
+}
+
+.btn-rojo {
+    background: #d9534f;
+}
+
+.btn-rojo:hover {
+    background: #b52b27;
+}
+
+.btn-verde {
+    background: #28a745;
+}
+
+.btn-verde:hover {
+    background: #1e7e34;
+}
+
+/* ===== FORMULARIOS ===== */
+form {
+    width: 90%;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    border-radius: 5px;
+    border: 1px solid #aaa;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+    background: #ffeb80;
+    padding: 10px;
+    text-align: center;
+    margin-top: 40px;
+    font-weight: bold;
+    border-top: 2px solid #d4c04e;
+}

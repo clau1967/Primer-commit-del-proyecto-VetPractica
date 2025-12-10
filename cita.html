@@ -1,0 +1,104 @@
+<?php
+$conexion = new mysqli("localhost", "vetsantiago", "veterinaria123", "veterinaria");
+
+if ($conexion->connect_error) {
+    die("Error de conexión: " . $conexion->connect_error);
+}
+
+// -------- CONSULTA DE CLIENTES Y MASCOTAS --------
+$listaClientes = $conexion->query("SELECT * FROM clientes");
+
+$listaMascotas = $conexion->query("
+    SELECT mascotas.id_mascota, mascotas.nombre, clientes.nombre AS cliente
+    FROM mascotas
+    INNER JOIN clientes ON mascotas.id_cliente = clientes.id_cliente
+");
+
+// -------- AGREGAR CITA --------
+if (isset($_POST['agregar'])) {
+    $id_cliente = $_POST['id_cliente'];
+    $id_mascota = $_POST['id_mascota'];
+    $id_veterinario = $_POST['id_veterinario'];
+    $id_consultorio = $_POST['id_consultorio'];
+    $fecha_hora = $_POST['fecha_hora'];
+    $motivo = $_POST['motivo'];
+    $estado = $_POST['estado'];
+
+    $conexion->query("INSERT INTO citas 
+        (id_cliente, id_mascota, id_veterinario, id_consultorio, fecha_hora, motivo, estado)
+        VALUES ($id_cliente, $id_mascota, $id_veterinario, $id_consultorio, '$fecha_hora', '$motivo', '$estado')");
+}
+
+// -------- ELIMINAR CITA --------
+if (isset($_GET['eliminar'])) {
+    $conexion->query("DELETE FROM citas WHERE id_cita = " . $_GET['eliminar']);
+}
+
+// -------- CONSULTAR CITAS --------
+$citas = $conexion->query("
+    SELECT c.*, cl.nombre AS cliente, m.nombre AS mascota
+    FROM citas c
+    INNER JOIN clientes cl ON c.id_cliente = cl.id_cliente
+    INNER JOIN mascotas m ON c.id_mascota = m.id_mascota
+    ORDER BY c.id_cita DESC
+");
+?>
+
+<!-- AQUI SIGUE TU DISEÑO TAL CUAL -->
+<h2>Citas</h2>
+
+<form method="POST">
+    <select name="id_cliente" required>
+        <option value="">Selecciona cliente</option>
+        <?php while ($cl = $listaClientes->fetch_assoc()) { ?>
+            <option value="<?= $cl['id_cliente'] ?>"><?= $cl['nombre'] . " " . $cl['apellido'] ?></option>
+        <?php } ?>
+    </select>
+
+    <select name="id_mascota" required>
+        <option value="">Selecciona mascota</option>
+        <?php while ($m = $listaMascotas->fetch_assoc()) { ?>
+            <option value="<?= $m['id_mascota'] ?>"><?= $m['nombre'] ?> (<?= $m['cliente'] ?>)</option>
+        <?php } ?>
+    </select>
+
+    <input type="number" name="id_veterinario" placeholder="ID Vet" required>
+    <input type="number" name="id_consultorio" placeholder="ID Consultorio" required>
+    <input type="datetime-local" name="fecha_hora" required>
+    <input type="text" name="motivo" placeholder="Motivo">
+    
+    <select name="estado">
+        <option value="Pendiente">Pendiente</option>
+        <option value="Confirmada">Confirmada</option>
+        <option value="Cancelada">Cancelada</option>
+        <option value="Finalizada">Finalizada</option>
+    </select>
+
+    <button type="submit" name="agregar">Agregar</button>
+</form>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th>Mascota</th>
+        <th>Fecha</th>
+        <th>Motivo</th>
+        <th>Estado</th>
+        <th>Acción</th>
+    </tr>
+
+    <?php while ($c = $citas->fetch_assoc()) { ?>
+        <tr>
+            <td><?= $c['id_cita'] ?></td>
+            <td><?= $c['cliente'] ?></td>
+            <td><?= $c['mascota'] ?></td>
+            <td><?= $c['fecha_hora'] ?></td>
+            <td><?= $c['motivo'] ?></td>
+            <td><?= $c['estado'] ?></td>
+            <td>
+                <a href="citas.php?eliminar=<?= $c['id_cita'] ?>">Eliminar</a>
+            </td>
+        </tr>
+    <?php } ?>
+</table>
