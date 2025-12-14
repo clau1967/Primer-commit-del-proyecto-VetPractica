@@ -71,7 +71,9 @@ if (isset($_GET['editar'])) {
 // LISTAR FÓRMULAS
 // -------------------------
 $formulas = $conexion->query("
-    SELECT f.*, h.id AS historia_id, h.motivo, m.nombre AS mascota_nombre, c.nombre AS cliente_nombre, c.apellido AS cliente_apellido
+    SELECT f.*, h.id AS historia_id, h.motivo,
+           m.nombre AS mascota_nombre,
+           c.nombre AS cliente_nombre, c.apellido AS cliente_apellido
     FROM formulas f
     JOIN historias_clinicas h ON f.historia_clinica_id = h.id
     JOIN mascotas m ON h.mascota_id = m.id_mascota
@@ -83,7 +85,9 @@ $formulas = $conexion->query("
 // LISTAR HISTORIAS PARA SELECT
 // -------------------------
 $historias = $conexion->query("
-    SELECT h.id, m.nombre AS mascota_nombre, c.nombre AS cliente_nombre, c.apellido AS cliente_apellido, h.motivo
+    SELECT h.id, m.nombre AS mascota_nombre,
+           c.nombre AS cliente_nombre, c.apellido AS cliente_apellido,
+           h.motivo
     FROM historias_clinicas h
     JOIN mascotas m ON h.mascota_id = m.id_mascota
     JOIN clientes c ON m.id_cliente = c.id_cliente
@@ -146,7 +150,7 @@ input:focus, textarea:focus, select:focus { border-color:#ffb703; outline:none; 
     <form action="formulas.php" method="POST" class="form-grid">
         <input type="hidden" name="id" value="<?= $editar ? htmlspecialchars($editar['id']) : '' ?>">
 
-        <select name="historia_clinica_id" required>
+        <select name="historia_clinica_id" required class="full">
             <option value="">Seleccione Historia Clínica</option>
             <?php while($h = $historias->fetch_assoc()): ?>
                 <option value="<?= $h['id'] ?>" <?= $editar && $editar['historia_clinica_id']==$h['id'] ? 'selected' : '' ?>>
@@ -156,11 +160,21 @@ input:focus, textarea:focus, select:focus { border-color:#ffb703; outline:none; 
         </select>
 
         <input type="text" name="descripcion" placeholder="Descripción" required value="<?= $editar ? htmlspecialchars($editar['descripcion']) : '' ?>">
-        <input type="text" name="dosis" placeholder="Dosis" value="<?= $editar ? htmlspecialchars($editar['dosis']) : '' ?>">
+
+        <!-- 🔴 CAMBIO ÚNICO: DOSIS LIBRE (NO SELECT) -->
+        <input
+            type="text"
+            name="dosis"
+            placeholder="Dosis (ej: 1 ml cada 12 horas por 7 días)"
+            value="<?= $editar ? htmlspecialchars($editar['dosis']) : '' ?>"
+        >
+
         <input type="text" name="indicaciones" placeholder="Indicaciones" value="<?= $editar ? htmlspecialchars($editar['indicaciones']) : '' ?>">
         <input type="text" name="medicamento" placeholder="Medicamento" value="<?= $editar ? htmlspecialchars($editar['medicamento']) : '' ?>">
 
-        <button type="submit" name="<?= $editar ? 'editar' : 'guardar' ?>" class="btn full"><?= $editar ? 'Actualizar' : '➕ Guardar' ?></button>
+        <button type="submit" name="<?= $editar ? 'editar' : 'guardar' ?>" class="btn full">
+            <?= $editar ? 'Actualizar' : '➕ Guardar' ?>
+        </button>
     </form>
 </div>
 
