@@ -1,3 +1,5 @@
+<?php include 'includes/header.php'; ?>
+
 <?php
 // reportes.php — Listado de Historias Clínicas con diseño funcional y columnas ajustadas
 
@@ -144,3 +146,6 @@ h2 { color:#023047; text-align:center; margin-top:0; }
 
 </body>
 </html>
+
+
+<?php include 'includes/footer.php'; ?>

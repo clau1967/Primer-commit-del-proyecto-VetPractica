@@ -1,3 +1,5 @@
+<?php include 'includes/header.php'; ?>
+
 <?php
 // ================== CONEXIÓN ==================
 $conexion = new mysqli("localhost", "vetsantiago", "veterinaria123", "veterinaria");
@@ -320,3 +322,6 @@ footer{
 
 </body>
 </html>
+
+
+<?php include 'includes/footer.php'; ?>

@@ -1,3 +1,5 @@
+<?php include 'includes/header.php'; ?>
+
 <?php
 // historias.php - Gestión completa de Historias Clínicas
 
@@ -258,3 +260,6 @@ input:focus, select:focus, textarea:focus { border-color:#ffb703; outline:none; 
 
 </body>
 </html>
+
+
+<?php include 'includes/footer.php'; ?>

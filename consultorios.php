@@ -1,3 +1,5 @@
+<?php include 'includes/header.php'; ?>
+
 <?php
 // consultorios.php - CRUD completo
 
@@ -155,3 +157,6 @@ input:focus { border-color:#ffb703; outline:none; box-shadow:0 0 5px rgba(255,18
 
 </body>
 </html>
+
+
+<?php include 'includes/footer.php'; ?>

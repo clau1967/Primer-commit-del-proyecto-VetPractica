@@ -1,3 +1,5 @@
+<?php include 'includes/header.php'; ?>
+
 <?php
 // formulas.php — Gestión CRUD de fórmulas
 
@@ -228,3 +230,6 @@ input:focus, textarea:focus, select:focus { border-color:#ffb703; outline:none; 
 
 </body>
 </html>
+
+
+<?php include 'includes/footer.php'; ?>

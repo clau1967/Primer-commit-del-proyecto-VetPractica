@@ -1,3 +1,5 @@
+<?php include 'includes/header.php'; ?>
+
 <?php
 $conexion = new mysqli("localhost", "vetsantiago", "veterinaria123", "veterinaria");
 if ($conexion->connect_errno) die("Error de conexión: " . $conexion->connect_error);
@@ -193,3 +195,6 @@ while($c = $clientes->fetch_assoc()) {
 
 </body>
 </html>
+
+
+<?php include 'includes/footer.php'; ?>

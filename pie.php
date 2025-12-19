@@ -1,3 +1,5 @@
+<?php include 'includes/header.php'; ?>
+
 <footer class="footer">
     <div class="footer-content">
 
@@ -15,3 +17,6 @@
 
     </div>
 </footer>
+
+
+<?php include 'includes/footer.php'; ?>

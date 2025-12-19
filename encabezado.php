@@ -1,3 +1,5 @@
+<?php include 'includes/header.php'; ?>
+
 <header class="header">
     <img src="img/logo.png" class="logo-pequeno" alt="Logo">
 
@@ -15,3 +17,6 @@
         <a href="reportes.php">Reportes</a>
     </nav>
 </header>
+
+
+<?php include 'includes/footer.php'; ?>
