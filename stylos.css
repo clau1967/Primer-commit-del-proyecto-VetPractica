@@ -1,133 +1,301 @@
-/* ======== GENERAL ======== */
-body {
+/* ===============================
+   RESET
+================================ */
+* {
     margin: 0;
     padding: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f9f9f9;
+    box-sizing: border-box;
 }
 
-/* ======== HEADER ======== */
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: #fffdf6;
+    color: #3f3a2e;
+}
+
+/* ===============================
+   HEADER
+================================ */
 .header {
+    background-color: #fff3c4;
+    border-bottom: 1px solid #f0e0a6;
+    padding: 12px 24px;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    background-color: #ffeb80; /* amarillo claro */
-    padding: 10px 20px;
-    border-bottom: 2px solid #d4c04e;
+    align-items: center;
 }
 
-.logo-pequeno {
-    width: 70px;
-    height: auto;
-    margin-right: 15px;
-}
-
-/* Contenedor título + menú */
-.header-contenido {
+.header-left {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
 }
 
-.header h1 {
-    margin: 0;
-    font-size: 26px;
-    color: #333;
+.header-left img {
+    height: 42px;
 }
 
-/* ======== MENÚ ======== */
-.menu {
-    display: flex;
-    gap: 15px;
+.header-title {
+    font-weight: 600;
+    font-size: 18px;
+    color: #7a5c00;
 }
 
-.menu a {
+.header-nav a {
+    margin-left: 18px;
     text-decoration: none;
-    color: #333;
-    font-weight: bold;
-    padding: 6px 10px;
-    border-radius: 5px;
-}
-
-.menu a:hover {
-    background: #fff7c2;
-}
-
-/* ======== TABLAS ======== */
-table {
-    width: 95%;
-    margin: 20px auto;
-    border-collapse: collapse;
-    background: white;
-}
-
-table th, table td {
-    padding: 10px;
-    border: 1px solid #ccc;
-    text-align: left;
-}
-
-table th {
-    background: #ffe66d;
-}
-
-/* ======== BOTONES ======== */
-.btn {
-    padding: 7px 12px;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.btn-azul {
-    background: #007bff;
-}
-
-.btn-azul:hover {
-    background: #0056b3;
-}
-
-.btn-rojo {
-    background: #d9534f;
-}
-
-.btn-rojo:hover {
-    background: #b52b27;
-}
-
-.btn-verde {
-    background: #28a745;
-}
-
-.btn-verde:hover {
-    background: #1e7e34;
-}
-
-/* ===== FORMULARIOS ===== */
-form {
-    width: 90%;
-    margin: auto;
-    background: white;
-    padding: 20px;
+    font-weight: 500;
+    color: #7a6a2f;
+    padding: 6px 12px;
     border-radius: 10px;
+    transition: all 0.2s ease;
 }
 
-input, select {
+.header-nav a:hover {
+    background-color: #ffe9a3;
+    color: #5f4a00;
+}
+
+.header-nav a.active {
+    background-color: #ffe08a;
+    color: #4a3a00;
+}
+
+/* ===============================
+   TÍTULOS
+================================ */
+h4 {
+    color: #7a5c00;
+    font-weight: 600;
+}
+
+.text-muted {
+    color: #9c8c55 !important;
+}
+
+/* ===============================
+   TÍTULO DEL MÓDULO (MEJORADO)
+================================ */
+.title-vet {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background-color: #fff7da; /* amarillo institucional suave */
+    border: 1px solid #f0e0a6;
+    border-radius: 20px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.title-vet img {
+    width: 56px;
+    height: 56px;
+}
+
+.title-vet h4 {
+    margin: 0;
+    color: #7a5c00; /* amarillo institucional oscuro */
+    font-weight: 700;
+    font-size: 22px;
+}
+
+.title-vet p {
+    margin: 4px 0 0;
+    font-size: 15px;
+    color: #9c8c55; /* amarillo institucional suave */
+    font-weight: 500;
+}
+
+/* ===============================
+   CARDS
+================================ */
+.card {
+    border-radius: 18px;
+    border: none;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.card h6 {
+    font-weight: 600;
+    color: #7a5c00;
+}
+
+/* ===============================
+   FORMULARIOS
+================================ */
+.form-label {
+    font-weight: 500;
+    color: #6a5a2a;
+}
+
+.form-control {
+    border-radius: 12px;
+    border: 1px solid #eadfae;
+}
+
+.form-control:focus {
+    border-color: #f2c94c;
+    box-shadow: 0 0 0 0.15rem rgba(242, 201, 76, 0.35);
+}
+
+/* ===============================
+   BOTONES
+================================ */
+.btn {
+    border-radius: 14px;
+    padding: 8px 18px;
+    font-weight: 500;
+}
+
+/* Guardar */
+.btn-success {
+    background-color: #f2c94c;
+    border: none;
+    color: #4a3a00;
+}
+
+.btn-success:hover {
+    background-color: #e6b93c;
+    color: #3a2d00;
+}
+
+/* Cancelar */
+.btn-secondary {
+    background-color: #f6e6b8;
+    border: none;
+    color: #5a4a1a;
+}
+
+.btn-secondary:hover {
+    background-color: #eedb9c;
+}
+
+/* Editar */
+.btn-outline-primary {
+    border-color: #f2c94c;
+    color: #7a5c00;
+}
+
+.btn-outline-primary:hover {
+    background-color: #f2c94c;
+    color: #4a3a00;
+}
+
+/* Eliminar */
+.btn-outline-danger {
+    border-color: #f5b5b5;
+    color: #b44a4a;
+}
+
+.btn-outline-danger:hover {
+    background-color: #f5b5b5;
+    color: #fff;
+}
+
+/* ===============================
+   BOTONES DE ACCIÓN (EDITAR / ELIMINAR)
+================================ */
+.btn-action {
+    border-radius: 16px;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* EDITAR */
+.btn-edit {
+    background-color: #fff3c4;
+    border: 1px solid #f2c94c;
+    color: #7a5c00;
+}
+
+.btn-edit:hover {
+    background-color: #f2c94c;
+    color: #4a3a00;
+    transform: translateY(-1px);
+}
+
+/* ELIMINAR */
+.btn-delete {
+    background-color: #ffe5e5;
+    border: 1px solid #f5b5b5;
+    color: #9a3c3c;
+}
+
+.btn-delete:hover {
+    background-color: #f5b5b5;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+/* ===============================
+   TABLA ENMARCADA
+================================ */
+.table-card {
+    background-color: #fff7da; /* amarillo institucional suave */
+    border: 1px solid #f0e0a6;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+    overflow-x: auto;
+}
+
+.table-card table {
+    border-radius: 12px;
+    overflow: hidden;
     width: 100%;
-    padding: 8px;
-    margin: 8px 0;
-    border-radius: 5px;
-    border: 1px solid #aaa;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
-/* ===== FOOTER ===== */
-.footer {
-    background: #ffeb80;
-    padding: 10px;
-    text-align: center;
-    margin-top: 40px;
-    font-weight: bold;
-    border-top: 2px solid #d4c04e;
+.table-card thead {
+    background-color: #fff1bf;
+}
+
+.table-card th, .table-card td {
+    vertical-align: middle;
+    padding: 10px 12px;
+}
+
+.table-card th {
+    font-weight: 600;
+    color: #6a5200;
+}
+
+.table-card tbody tr:hover {
+    background-color: #fff3c4;
+    transition: background 0.2s;
+}
+
+/* ===============================
+   ALERTAS
+================================ */
+.alert-warning {
+    border-radius: 14px;
+    background-color: #fff3cd;
+    border: 1px solid #ffe69c;
+    color: #7a5c00;
+}
+
+/* ===============================
+   FOOTER
+================================ */
+.footer-vet {
+    background-color: #fff3c4;
+    border-top: 1px solid #f0e0a6;
+    padding: 22px 0;
+}
+
+.footer-vet p {
+    color: #7a5c00;
+}
+
+.footer-vet small {
+    color: #9c8c55;
 }
