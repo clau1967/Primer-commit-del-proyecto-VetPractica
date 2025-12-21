@@ -1,122 +1,215 @@
-<?php
-session_start();
-
-// Si no está logueada, redirigir al login
-if (!isset($_SESSION['usuario'])) {
-    header("Location: login.php");
-    exit();
-}
-?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Bienvenida - Veterinaria Santiago Barrera</title>
+    <title>Veterinaria Santiago Barrera - Inicio</title>
+
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- CSS global (Clientes como base) -->
+    <link rel="stylesheet" href="stylos.css">
 
     <style>
-        body {
-            background-color: #f8f3c8;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-
-            /* Para que el footer no quede tan lejos */
+        /* ===============================
+           Tarjetas de acceso a entidades
+        =============================== */
+        .quick-access {
+            background: #fff8e1; /* amarillo suave */
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
-            padding-top: 30px;
+            justify-content: center;
+            padding: 30px 15px;
+            text-decoration: none;
+            color: #333;
         }
 
-        .container {
-            background: white;
-            width: 380px;
-            padding: 30px;
-            border-radius: 18px;
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+        .quick-access span.emoji-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .quick-access h5 {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #ffb400; /* amarillo institucional */
+        }
+
+        .quick-access p {
+            font-size: 0.9rem;
+            color: #555;
             text-align: center;
-            margin-bottom: 30px;
         }
 
-        h2 {
-            margin-top: 10px;
-            color: #444;
-        }
-
-        .btn {
-            display: block;
-            width: 100%;
-            background: #f5b335;
+        .quick-access:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            background: #fff3c9;
             color: #000;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 10px;
-            font-size: 16px;
-            text-decoration: none;
-            font-weight: bold;
-
-            /* Hover */
-            transition: 0.25s ease;
-            box-shadow: 0px 3px 8px rgba(0,0,0,0.15);
         }
 
-        .btn:hover {
-            background: #ffca47;
-            transform: translateY(-2px);
-            box-shadow: 0px 5px 14px rgba(0,0,0,0.25);
+        .quick-access p:hover {
+            color: #333;
         }
 
-        .logout {
-            margin-top: 10px;
-            color: red;
-            font-weight: bold;
-            text-decoration: none;
+        /* ===============================
+           Bienvenida principal
+        =============================== */
+        .title-vet {
+            background: linear-gradient(90deg, #fff3c9, #fff8e1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 40px 20px;
+            border-radius: 15px;
         }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 15px;
-            font-size: 14px;
-            color: #444;
-            margin-top: auto;
+        .title-vet h2 {
+            font-weight: 700;
+            color: #ffb400;
         }
 
-        footer a {
-            color: #444;
-            text-decoration: none;
-            font-weight: bold;
+        .title-vet h2 span {
+            color: #ffa500;
+        }
+
+        .title-vet p {
+            font-size: 1.1rem;
+            color: #555;
         }
     </style>
-
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
-    <div class="container">
-        <img src="img/logo.png" width="170" alt="Logo">
-        <h2>Bienvenida</h2>
-
-        <a class="btn" href="clientes.php">👤 Clientes</a>
-        <a class="btn" href="mascotas.php">🐾 Mascotas</a>
-        <a class="btn" href="cita.php">📅 Citas</a>
-        <a class="btn" href="veterinarios.php">👨‍⚕️ Veterinarios</a>
-        <a class="btn" href="consultorios.php">🩺 Consultorios</a>
-        <a class="btn" href="historias.php">📋 Historias Clínicas</a>
-        <a class="btn" href="formulas.php">💊 Fórmulas</a>
-        <a class="btn" href="reportes.php">📊 Reportes</a>
-
-        <a class="logout" href="logout.php">Cerrar sesión</a>
+<!-- ===============================
+     HEADER
+================================ -->
+<header class="header">
+    <div class="header-left">
+        <img src="img/logo.png" alt="Veterinaria Santiago Barrera">
+        <span class="header-title">Veterinaria Santiago Barrera</span>
     </div>
 
-   <footer>
-        <p>© 2025 Veterinaria Santiago Barrera — Todos los derechos reservados.</p>
-        <p>
-            🟢 <a href="https://wa.me/573176801793" target="_blank">WhatsApp 3176801793</a> |
-            <a href="https://www.instagram.com/santiagobarreraveterinario" target="_blank">@santiagobarreraveterinario</a>
-        </p>
-    </footer>
+    <nav class="header-nav">
+        <a href="index.php" class="active">Inicio</a>
+        <a href="clientes.php">Clientes</a>
+        <a href="mascotas.php">Mascotas</a>
+        <a href="citas.php">Citas</a>
+        <a href="reportes.php">Reportes</a>
+        <a href="historias.php">Historias</a>
+        <a href="consultorios.php">Consultorios</a>
+        <a href="veterinarios.php">Veterinarios</a>
+        <a href="formulas.php">Fórmulas</a>
+    </nav>
+</header>
 
+<!-- ===============================
+     CONTENIDO PRINCIPAL
+================================ -->
+<main class="flex-fill">
+    <div class="container my-5">
+
+        <!-- BIENVENIDA PRINCIPAL -->
+        <div class="title-vet mb-5 text-center">
+            <h2>🐾 Bienvenido a <span>Veterinaria Santiago Barrera</span></h2>
+            <p>Accede a cada sección del sistema de manera rápida, sencilla y profesional</p>
+        </div>
+
+        <!-- TARJETAS DE ACCESO -->
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 justify-content-center">
+
+            <div class="col">
+                <a href="clientes.php" class="quick-access h-100">
+                    <span class="emoji-icon">👤</span>
+                    <h5>Clientes</h5>
+                    <p>Gestiona los propietarios de mascotas</p>
+                </a>
+            </div>
+
+            <div class="col">
+                <a href="mascotas.php" class="quick-access h-100">
+                    <span class="emoji-icon">🐶</span>
+                    <h5>Mascotas</h5>
+                    <p>Registra y controla la información de las mascotas</p>
+                </a>
+            </div>
+
+            <div class="col">
+                <a href="citas.php" class="quick-access h-100">
+                    <span class="emoji-icon">📅</span>
+                    <h5>Citas</h5>
+                    <p>Gestiona las citas de los clientes</p>
+                </a>
+            </div>
+
+            <div class="col">
+                <a href="reportes.php" class="quick-access h-100">
+                    <span class="emoji-icon">📊</span>
+                    <h5>Reportes</h5>
+                    <p>Consulta reportes clínicos y administrativos</p>
+                </a>
+            </div>
+
+            <div class="col">
+                <a href="historias.php" class="quick-access h-100">
+                    <span class="emoji-icon">📖</span>
+                    <h5>Historias</h5>
+                    <p>Consulta historias clínicas de mascotas</p>
+                </a>
+            </div>
+
+            <div class="col">
+                <a href="consultorios.php" class="quick-access h-100">
+                    <span class="emoji-icon">🏥</span>
+                    <h5>Consultorios</h5>
+                    <p>Visualiza y gestiona los consultorios</p>
+                </a>
+            </div>
+
+            <div class="col">
+                <a href="veterinarios.php" class="quick-access h-100">
+                    <span class="emoji-icon">👩‍⚕️</span>
+                    <h5>Veterinarios</h5>
+                    <p>Gestiona la información de los profesionales</p>
+                </a>
+            </div>
+
+            <div class="col">
+                <a href="formulas.php" class="quick-access h-100">
+                    <span class="emoji-icon">💊</span>
+                    <h5>Fórmulas</h5>
+                    <p>Registra y consulta fórmulas médicas</p>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<!-- ===============================
+     FOOTER OFICIAL
+================================ -->
+<footer class="footer-vet mt-auto">
+    <div class="container text-center">
+        <p class="fw-semibold mb-1">
+            🐾 Veterinaria Santiago Barrera
+        </p>
+        <p class="text-muted mb-2">
+            Cuidado profesional y amor para tus mascotas
+        </p>
+
+        <div class="d-flex justify-content-center gap-3 mb-2">
+            <span>🟢 WhatsApp: 317 680 1793</span>
+            <span>📸 Instagram: @santiagobarreraveterinario</span>
+        </div>
+
+        <small class="text-muted">
+            © 2025 Veterinaria Santiago Barrera — Todos los derechos reservados
+        </small>
+    </div>
+</footer>
 
 </body>
 </html>
