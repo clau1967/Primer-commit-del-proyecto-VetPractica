@@ -1,6 +1,23 @@
-/* ===============================
-   RESET
-================================ */
+/* ======================================================
+   VARIABLES DE COLOR (AMARILLOS + BLANCOS)
+====================================================== */
+:root {
+    --vet-yellow-main: #f2c94c;
+    --vet-yellow-soft: #fff3c4;
+    --vet-yellow-light: #fff7da;
+    --vet-yellow-dark: #7a5c00;
+
+    --vet-border: #f0e0a6;
+    --vet-bg: #fffdf6;
+    --vet-white: #ffffff;
+
+    --vet-text-main: #3f3a2e;
+    --vet-text-muted: #9c8c55;
+}
+
+/* ======================================================
+   RESET Y BASE
+====================================================== */
 * {
     margin: 0;
     padding: 0;
@@ -9,16 +26,16 @@
 
 body {
     font-family: "Segoe UI", Arial, sans-serif;
-    background-color: #fffdf6;
-    color: #3f3a2e;
+    background-color: var(--vet-bg);
+    color: var(--vet-text-main);
 }
 
-/* ===============================
+/* ======================================================
    HEADER
-================================ */
+====================================================== */
 .header {
-    background-color: #fff3c4;
-    border-bottom: 1px solid #f0e0a6;
+    background-color: var(--vet-yellow-soft);
+    border-bottom: 2px solid var(--vet-border);
     padding: 12px 24px;
     display: flex;
     justify-content: space-between;
@@ -36,52 +53,54 @@ body {
 }
 
 .header-title {
-    font-weight: 600;
     font-size: 18px;
-    color: #7a5c00;
+    font-weight: 600;
+    color: var(--vet-yellow-dark);
 }
 
 .header-nav a {
     margin-left: 18px;
     text-decoration: none;
     font-weight: 500;
-    color: #7a6a2f;
-    padding: 6px 12px;
-    border-radius: 10px;
+    color: var(--vet-yellow-dark);
+    padding: 6px 14px;
+    border-radius: 14px;
     transition: all 0.2s ease;
 }
 
-.header-nav a:hover {
-    background-color: #ffe9a3;
-    color: #5f4a00;
-}
-
+.header-nav a:hover,
 .header-nav a.active {
-    background-color: #ffe08a;
+    background-color: var(--vet-yellow-main);
     color: #4a3a00;
 }
 
-/* ===============================
-   TÍTULOS
-================================ */
+/* ======================================================
+   TITULOS
+====================================================== */
 h4 {
-    color: #7a5c00;
+    color: var(--vet-yellow-dark);
     font-weight: 600;
 }
 
 .text-muted {
-    color: #9c8c55 !important;
+    color: var(--vet-text-muted) !important;
 }
 
-/* ===============================
-   TÍTULO DEL MÓDULO (MEJORADO)
-================================ */
+.logo-pequeno {
+    width: 70px;
+    height: auto;
+    margin-right: 15px;
+}
+
+/* ======================================================
+   TITULO DE MODULO
+====================================================== */
 .title-vet {
     display: flex;
     align-items: center;
     gap: 16px;
-    background-color: #fff7da; /* amarillo institucional suave */
-    border: 1px solid #f0e0a6;
+    background-color: var(--vet-yellow-light);
+    border: 1px solid var(--vet-border);
     border-radius: 20px;
     padding: 16px 20px;
     margin-bottom: 24px;
@@ -95,35 +114,64 @@ h4 {
 
 .title-vet h4 {
     margin: 0;
-    color: #7a5c00; /* amarillo institucional oscuro */
-    font-weight: 700;
     font-size: 22px;
+    font-weight: 700;
+    color: var(--vet-yellow-dark);
 }
 
 .title-vet p {
-    margin: 4px 0 0;
+    margin-top: 4px;
     font-size: 15px;
-    color: #9c8c55; /* amarillo institucional suave */
     font-weight: 500;
+    color: var(--vet-text-muted);
 }
 
-/* ===============================
+/* ======================================================
+   MENU
+====================================================== */
+.menu {
+    display: flex;
+    gap: 15px;
+}
+
+.menu a {
+    text-decoration: none;
+    color: var(--vet-yellow-dark);
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 10px;
+}
+
+.menu a:hover {
+    background-color: var(--vet-yellow-soft);
+}
+
+/* ======================================================
    CARDS
-================================ */
+====================================================== */
 .card {
+    background-color: var(--vet-white);
     border-radius: 18px;
     border: none;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
 }
 
 .card h6 {
     font-weight: 600;
-    color: #7a5c00;
+    color: var(--vet-yellow-dark);
 }
 
-/* ===============================
+/* ======================================================
    FORMULARIOS
-================================ */
+====================================================== */
+form {
+    width: 90%;
+    margin: auto;
+    background-color: var(--vet-white);
+    padding: 20px;
+    border-radius: 14px;
+}
+
 .form-label {
     font-weight: 500;
     color: #6a5a2a;
@@ -131,39 +179,96 @@ h4 {
 
 .form-control {
     border-radius: 12px;
-    border: 1px solid #eadfae;
+    border: 1px solid var(--vet-border);
 }
 
 .form-control:focus {
-    border-color: #f2c94c;
+    border-color: var(--vet-yellow-main);
     box-shadow: 0 0 0 0.15rem rgba(242, 201, 76, 0.35);
 }
 
-/* ===============================
+/* ======================================================
+   TABLAS
+====================================================== */
+table {
+    width: 95%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background-color: var(--vet-white);
+}
+
+table th,
+table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table th {
+    background-color: var(--vet-yellow-main);
+    color: #4a3a00;
+}
+
+/* ======================================================
+   TABLA ENMARCADA
+====================================================== */
+.table-card {
+    background-color: var(--vet-yellow-light);
+    border: 1px solid var(--vet-border);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+    overflow-x: auto;
+}
+
+.table-card table {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table-card thead {
+    background-color: var(--vet-yellow-soft);
+}
+
+.table-card th {
+    font-weight: 600;
+    color: #6a5200;
+}
+
+.table-card td {
+    vertical-align: middle;
+    padding: 10px 12px;
+}
+
+.table-card tbody tr:hover {
+    background-color: var(--vet-yellow-soft);
+    transition: background 0.2s;
+}
+
+/* ======================================================
    BOTONES
-================================ */
+====================================================== */
 .btn {
-    border-radius: 14px;
     padding: 8px 18px;
+    border-radius: 16px;
     font-weight: 500;
+    border: none;
 }
 
 /* Guardar */
 .btn-success {
-    background-color: #f2c94c;
-    border: none;
+    background-color: var(--vet-yellow-main);
     color: #4a3a00;
 }
 
 .btn-success:hover {
     background-color: #e6b93c;
-    color: #3a2d00;
 }
 
 /* Cancelar */
 .btn-secondary {
-    background-color: #f6e6b8;
-    border: none;
+    background-color: var(--vet-yellow-soft);
     color: #5a4a1a;
 }
 
@@ -173,29 +278,31 @@ h4 {
 
 /* Editar */
 .btn-outline-primary {
-    border-color: #f2c94c;
-    color: #7a5c00;
+    border: 1px solid var(--vet-yellow-main);
+    background: transparent;
+    color: var(--vet-yellow-dark);
 }
 
 .btn-outline-primary:hover {
-    background-color: #f2c94c;
+    background-color: var(--vet-yellow-main);
     color: #4a3a00;
 }
 
 /* Eliminar */
 .btn-outline-danger {
-    border-color: #f5b5b5;
+    border: 1px solid #f5b5b5;
+    background: transparent;
     color: #b44a4a;
 }
 
 .btn-outline-danger:hover {
     background-color: #f5b5b5;
-    color: #fff;
+    color: #ffffff;
 }
 
-/* ===============================
-   BOTONES DE ACCIÓN (EDITAR / ELIMINAR)
-================================ */
+/* ======================================================
+   BOTONES DE ACCION
+====================================================== */
 .btn-action {
     border-radius: 16px;
     padding: 6px 14px;
@@ -208,94 +315,31 @@ h4 {
     box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
-/* EDITAR */
-.btn-edit {
-    background-color: #fff3c4;
-    border: 1px solid #f2c94c;
-    color: #7a5c00;
-}
-
-.btn-edit:hover {
-    background-color: #f2c94c;
-    color: #4a3a00;
-    transform: translateY(-1px);
-}
-
-/* ELIMINAR */
-.btn-delete {
-    background-color: #ffe5e5;
-    border: 1px solid #f5b5b5;
-    color: #9a3c3c;
-}
-
-.btn-delete:hover {
-    background-color: #f5b5b5;
-    color: #ffffff;
-    transform: translateY(-1px);
-}
-
-/* ===============================
-   TABLA ENMARCADA
-================================ */
-.table-card {
-    background-color: #fff7da; /* amarillo institucional suave */
-    border: 1px solid #f0e0a6;
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: 0 6px 14px rgba(0,0,0,0.06);
-    overflow-x: auto;
-}
-
-.table-card table {
-    border-radius: 12px;
-    overflow: hidden;
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-.table-card thead {
-    background-color: #fff1bf;
-}
-
-.table-card th, .table-card td {
-    vertical-align: middle;
-    padding: 10px 12px;
-}
-
-.table-card th {
-    font-weight: 600;
-    color: #6a5200;
-}
-
-.table-card tbody tr:hover {
-    background-color: #fff3c4;
-    transition: background 0.2s;
-}
-
-/* ===============================
+/* ======================================================
    ALERTAS
-================================ */
+====================================================== */
 .alert-warning {
     border-radius: 14px;
-    background-color: #fff3cd;
-    border: 1px solid #ffe69c;
-    color: #7a5c00;
+    background-color: var(--vet-yellow-soft);
+    border: 1px solid var(--vet-border);
+    color: var(--vet-yellow-dark);
 }
 
-/* ===============================
-   FOOTER
-================================ */
+/* ======================================================
+   FOOTER (OFICIAL – NO SE ROMPE)
+====================================================== */
 .footer-vet {
-    background-color: #fff3c4;
-    border-top: 1px solid #f0e0a6;
+    background-color: var(--vet-yellow-soft);
+    border-top: 1px solid var(--vet-border);
     padding: 22px 0;
+    text-align: center;
 }
 
 .footer-vet p {
-    color: #7a5c00;
+    font-weight: 600;
+    color: var(--vet-yellow-dark);
 }
 
 .footer-vet small {
-    color: #9c8c55;
+    color: var(--vet-text-muted);
 }

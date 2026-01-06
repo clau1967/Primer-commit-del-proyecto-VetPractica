@@ -1,180 +1,263 @@
-<?php include 'includes/header.php'; ?>
-
 <?php
-// veterinarios.php - CRUD completo
-
-$conexion = new mysqli("localhost", "vetsantiago", "veterinaria123", "veterinaria");
-if ($conexion->connect_errno) die("Error de conexión: " . $conexion->connect_error);
-
-// GUARDAR
-if (isset($_POST['guardar'])) {
-    $nombre   = $_POST['nombre'];
-    $apellido = $_POST['apellido'];
-    $telefono = $_POST['telefono'];
-    $correo   = $_POST['correo'];
-
-    $stmt = $conexion->prepare("INSERT INTO veterinarios (nombre, apellido, telefono, correo) VALUES (?,?,?,?)");
-    $stmt->bind_param("ssss", $nombre, $apellido, $telefono, $correo);
-    $stmt->execute();
-    $stmt->close();
-
-    header("Location: veterinarios.php");
-    exit;
+// ===============================
+// CONEXIÓN BD (MISMA QUE CLIENTES)
+// ===============================
+$conn = new mysqli("localhost", "vetsantiago", "veterinaria123", "veterinaria");
+if ($conn->connect_error) {
+    die("Error de conexión: " . $conn->connect_error);
 }
 
-// EDITAR
-if (isset($_POST['editar'])) {
-    $id = intval($_POST['id_veterinario']);
-    $nombre   = $_POST['nombre'];
-    $apellido = $_POST['apellido'];
-    $telefono = $_POST['telefono'];
-    $correo   = $_POST['correo'];
+// ===============================
+// VARIABLES
+// ===============================
+$id_veterinario = "";
+$nombre = "";
+$apellido = "";
+$especialidad = "";
+$telefono = "";
+$correo = "";
 
-    $stmt = $conexion->prepare("UPDATE veterinarios SET nombre=?, apellido=?, telefono=?, correo=? WHERE id_veterinario=?");
-    $stmt->bind_param("ssssi", $nombre, $apellido, $telefono, $correo, $id);
-    $stmt->execute();
-    $stmt->close();
+// ===============================
+// GUARDAR / ACTUALIZAR
+// ===============================
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    header("Location: veterinarios.php");
-    exit;
+    $id_veterinario = $_POST["id_veterinario"] ?? "";
+    $nombre         = $_POST["nombre"];
+    $apellido       = $_POST["apellido"];
+    $especialidad   = $_POST["especialidad"];
+    $telefono       = $_POST["telefono"];
+    $correo         = $_POST["correo"];
+
+    if ($id_veterinario == "") {
+
+        // INSERT
+        $stmt = $conn->prepare(
+            "INSERT INTO veterinarios 
+            (nombre, apellido, especialidad, telefono, correo)
+            VALUES (?, ?, ?, ?, ?)"
+        );
+        $stmt->bind_param("sssss", $nombre, $apellido, $especialidad, $telefono, $correo);
+        $stmt->execute();
+
+        header("Location: veterinarios.php");
+        exit;
+
+    } else {
+
+        // UPDATE
+        $stmt = $conn->prepare(
+            "UPDATE veterinarios SET
+                nombre=?,
+                apellido=?,
+                especialidad=?,
+                telefono=?,
+                correo=?
+             WHERE id_veterinario=?"
+        );
+        $stmt->bind_param(
+            "sssssi",
+            $nombre,
+            $apellido,
+            $especialidad,
+            $telefono,
+            $correo,
+            $id_veterinario
+        );
+        $stmt->execute();
+
+        header("Location: veterinarios.php");
+        exit;
+    }
 }
 
+// ===============================
+// EDITAR (PRECARGA)
+// ===============================
+if (isset($_GET["editar"])) {
+    $id_veterinario = $_GET["editar"];
+
+    $stmt = $conn->prepare("SELECT * FROM veterinarios WHERE id_veterinario=?");
+    $stmt->bind_param("i", $id_veterinario);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($row = $result->fetch_assoc()) {
+        $nombre       = $row["nombre"];
+        $apellido     = $row["apellido"];
+        $especialidad = $row["especialidad"];
+        $telefono     = $row["telefono"];
+        $correo       = $row["correo"];
+    }
+}
+
+// ===============================
 // ELIMINAR
-if (isset($_GET['eliminar'])) {
-    $id = intval($_GET['eliminar']);
-    $stmt = $conexion->prepare("DELETE FROM veterinarios WHERE id_veterinario=?");
+// ===============================
+if (isset($_GET["eliminar"])) {
+    $id = $_GET["eliminar"];
+
+    $stmt = $conn->prepare("DELETE FROM veterinarios WHERE id_veterinario=?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
-    $stmt->close();
 
     header("Location: veterinarios.php");
     exit;
 }
 
-// CONSULTA PARA FORMULARIO DE EDICIÓN
-$editar = null;
-if (isset($_GET['editar'])) {
-    $id = intval($_GET['editar']);
-    $res = $conexion->query("SELECT * FROM veterinarios WHERE id_veterinario=$id LIMIT 1");
-    if ($res && $res->num_rows) $editar = $res->fetch_assoc();
-}
-
-// LISTA TABLA
-$vets = $conexion->query("SELECT * FROM veterinarios ORDER BY nombre, apellido");
+// ===============================
+// LISTADO
+// ===============================
+$veterinarios = $conn->query(
+    "SELECT * FROM veterinarios ORDER BY id_veterinario DESC"
+);
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Veterinarios - Veterinaria Santiago Barrera</title>
+<title>Gestión de Veterinarios</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="stylos.css">
-<style>
-body { font-family: Arial, sans-serif; background:#f4f4f9; margin:0; padding:0; }
-.header { display:flex; justify-content:space-between; align-items:center; padding:10px 30px; background:#ffb703; color:white; }
-.header img { height:50px; }
-.header nav a { margin:0 10px; color:white; text-decoration:none; font-weight:bold; }
-.header nav a:hover { text-decoration:underline; }
-.contenedor { max-width:900px; margin:20px auto; padding:20px; background:white;
-    border-radius:10px; box-shadow:0 0 15px rgba(0,0,0,0.1); }
-h2 { color:#023047; text-align:center; }
-input { width:100%; padding:10px; margin:6px 0; border-radius:8px; border:1px solid #ccc; font-size:16px; }
-input:focus { border-color:#ffb703; outline:none; box-shadow:0 0 5px rgba(255,183,3,0.4);}
-.btn { padding:10px 18px; border:none; border-radius:8px; background:#ffb703; color:white; font-weight:bold;
-    cursor:pointer; margin-top:10px; transition:0.3s;}
-.btn:hover { background:#fb8500; }
-.tabla { width:100%; border-collapse: collapse; margin-top:20px; }
-.tabla th, .tabla td { border:1px solid #ddd; padding:12px; text-align:center; }
-.tabla th { background:#ffb703; color:white; }
-.fila:hover { background:#fef3d6; }
-.btn-tabla { padding:6px 10px; border-radius:5px; color:white; text-decoration:none; margin:0 5px; }
-.editar { background:#219ebc; }
-.eliminar { background:#e63946; }
-</style>
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
 
+<!-- ===============================
+ HEADER (IDÉNTICO A CLIENTES)
+================================ -->
 <header class="header">
-    <img src="img/logo.png" alt="Logo Veterinaria">
-    <h1>Veterinaria Santiago Barrera</h1>
-    <nav>
+    <div class="header-left">
+        <img src="img/logo.png" alt="Veterinaria Santiago Barrera">
+        <span class="header-title">Veterinaria Santiago Barrera</span>
+    </div>
+
+    <nav class="header-nav">
         <a href="index.php">Inicio</a>
         <a href="clientes.php">Clientes</a>
         <a href="mascotas.php">Mascotas</a>
-        <a href="cita.php">Citas</a>
+        <a href="citas.php">Citas</a>
         <a href="historias.php">Historias</a>
         <a href="consultorios.php">Consultorios</a>
-        <a href="veterinarios.php">Veterinarios</a>
+        <a href="veterinarios.php" class="active">Veterinarios</a>
         <a href="formulas.php">Fórmulas</a>
         <a href="reportes.php">Reportes</a>
     </nav>
 </header>
 
-<div class="contenedor">
-    <h2><?= $editar ? "Editar Veterinario" : "Nuevo Veterinario" ?></h2>
+<!-- ===============================
+ CONTENIDO
+================================ -->
+<main class="flex-fill container my-4">
 
-    <form method="POST">
-        <input type="hidden" name="id_veterinario" value="<?= $editar ? $editar['id_veterinario'] : '' ?>">
+    <div class="title-vet">
+        <h4>Gestión de Veterinarios</h4>
+    </div>
 
-        <input type="text" name="nombre" placeholder="Nombre" required
-               value="<?= $editar ? htmlspecialchars($editar['nombre']) : '' ?>">
+    <!-- FORMULARIO -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h6 class="mb-3 text-primary">
+                <?php echo $id_veterinario ? "Editar Veterinario" : "Registrar Veterinario"; ?>
+            </h6>
 
-        <input type="text" name="apellido" placeholder="Apellido" required
-               value="<?= $editar ? htmlspecialchars($editar['apellido']) : '' ?>">
+            <form method="POST">
+                <input type="hidden" name="id_veterinario" value="<?php echo $id_veterinario; ?>">
 
-        <input type="text" name="telefono" placeholder="Teléfono"
-               value="<?= $editar ? htmlspecialchars($editar['telefono']) : '' ?>">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" name="nombre" class="form-control" required value="<?php echo $nombre; ?>">
+                    </div>
 
-        <input type="email" name="correo" placeholder="Correo"
-               value="<?= $editar ? htmlspecialchars($editar['correo']) : '' ?>">
+                    <div class="col-md-4">
+                        <label class="form-label">Apellido</label>
+                        <input type="text" name="apellido" class="form-control" required value="<?php echo $apellido; ?>">
+                    </div>
 
-        <button type="submit" name="<?= $editar ? 'editar' : 'guardar' ?>" class="btn">
-            <?= $editar ? "Actualizar" : "➕ Guardar" ?>
-        </button>
-    </form>
-</div>
+                    <div class="col-md-4">
+                        <label class="form-label">Especialidad</label>
+                        <input type="text" name="especialidad" class="form-control" value="<?php echo $especialidad; ?>">
+                    </div>
 
-<div class="contenedor">
-    <h2>Lista de Veterinarios</h2>
-    <table class="tabla">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Teléfono</th>
-                <th>Correo</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-        <?php while($v = $vets->fetch_assoc()): ?>
-            <tr class="fila">
-                <td><?= $v['id_veterinario'] ?></td>
-                <td><?= htmlspecialchars($v['nombre']." ".$v['apellido']) ?></td>
-                <td><?= htmlspecialchars($v['telefono']) ?></td>
-                <td><?= htmlspecialchars($v['correo']) ?></td>
-                <td>
-                    <a href="veterinarios.php?editar=<?= $v['id_veterinario'] ?>" class="btn-tabla editar">✏ Editar</a>
-                    <a href="veterinarios.php?eliminar=<?= $v['id_veterinario'] ?>" class="btn-tabla eliminar"
-                       onclick="return confirm('¿Eliminar veterinario?')">🗑 Eliminar</a>
-                </td>
-            </tr>
-        <?php endwhile; ?>
-        </tbody>
-    </table>
-</div>
+                    <div class="col-md-4">
+                        <label class="form-label">Teléfono</label>
+                        <input type="text" name="telefono" class="form-control" value="<?php echo $telefono; ?>">
+                    </div>
 
-<div style="text-align:center; margin:20px 0;">
-    <a href="index.php" class="btn">🏠 Volver al inicio</a>
-</div>
+                    <div class="col-md-4">
+                        <label class="form-label">Correo</label>
+                        <input type="email" name="correo" class="form-control" value="<?php echo $correo; ?>">
+                    </div>
+                </div>
 
-<footer style="text-align:center; padding:20px; background:#023047; color:white; margin-top:20px;">
-© 2025 Veterinaria Santiago Barrera — Todos los derechos reservados.
+                <div class="mt-4">
+                    <button class="btn btn-success">💾 Guardar</button>
+                    <a href="veterinarios.php" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- LISTADO -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h6 class="mb-3">📋 Lista de Veterinarios</h6>
+
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Veterinario</th>
+                        <th>Especialidad</th>
+                        <th>Teléfono</th>
+                        <th>Correo</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php while ($v = $veterinarios->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo $v["id_veterinario"]; ?></td>
+                        <td><?php echo $v["nombre"] . " " . $v["apellido"]; ?></td>
+                        <td><?php echo $v["especialidad"]; ?></td>
+                        <td><?php echo $v["telefono"]; ?></td>
+                        <td><?php echo $v["correo"]; ?></td>
+                        <td class="text-center">
+                            <a href="veterinarios.php?editar=<?php echo $v["id_veterinario"]; ?>" class="btn-action btn-edit">✏️ Editar</a>
+                            <a href="veterinarios.php?eliminar=<?php echo $v["id_veterinario"]; ?>"
+                               class="btn-action btn-delete"
+                               onclick="return confirm('¿Eliminar este veterinario?')">🗑 Eliminar</a>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+<!-- ===============================
+ FOOTER (IDÉNTICO A CLIENTES)
+================================ -->
+<footer class="footer-vet mt-auto">
+    <div class="container text-center">
+        <p class="fw-semibold mb-1">🐾 Veterinaria Santiago Barrera</p>
+        <p class="text-muted mb-2">Cuidado profesional y amor para tus mascotas</p>
+
+        <div class="d-flex justify-content-center gap-3 mb-2">
+            <span>🟢 WhatsApp: 317 680 1793</span>
+            <span>📸 Instagram: @santiagobarreraveterinario</span>
+        </div>
+
+        <small class="text-muted">
+            © 2025 Veterinaria Santiago Barrera — Todos los derechos reservados
+        </small>
+    </div>
 </footer>
 
 </body>
 </html>
-
-
-<?php include 'includes/footer.php'; ?>

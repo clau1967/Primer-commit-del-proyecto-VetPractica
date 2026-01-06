@@ -1,162 +1,309 @@
-<?php include 'includes/header.php'; ?>
-
 <?php
-// consultorios.php - CRUD completo
+// ===============================
+// CONEXIÓN BD
+// ===============================
+$conn = new mysqli("localhost", "vetsantiago", "veterinaria123", "veterinaria");
+if ($conn->connect_error) {
+    die("Error de conexión: " . $conn->connect_error);
+}
 
-$conexion = new mysqli("localhost", "vetsantiago", "veterinaria123", "veterinaria");
-if ($conexion->connect_errno) die("Error de conexión: " . $conexion->connect_error);
+// ===============================
+// CATÁLOGOS CONTROLADOS
+// ===============================
+$lista_consultorios = [
+    "Consultorio 1",
+    "Consultorio 2",
+    "Consultorio 3"
+];
 
-// GUARDAR
-if (isset($_POST['guardar'])) {
-    $nombre = $_POST['nombre'];
+$lista_servicios = [
+    "Consulta general",
+    "Vacunación",
+    "Cirugía",
+    "Desparasitación",
+    "Control postoperatorio"
+];
 
-    $stmt = $conexion->prepare("INSERT INTO consultorios (nombre) VALUES (?)");
-    $stmt->bind_param("s", $nombre);
-    $stmt->execute();
-    $stmt->close();
+$lista_ubicaciones = [
+    "Primer piso",
+    "Segundo piso",
+    "Otro"
+];
+
+// ===============================
+// VETERINARIOS DESDE BD (NOMBRE COMPLETO)
+// ===============================
+$veterinarios = $conn->query("
+    SELECT id_veterinario,
+           CONCAT(nombre, ' ', apellido) AS nombre_completo
+    FROM veterinarios
+    ORDER BY nombre, apellido
+");
+
+// ===============================
+// VARIABLES
+// ===============================
+$id_consultorio = "";
+$nombre = "";
+$servicio = "";
+$veterinario_id = "";
+$ubicacion = "";
+$telefono = "";
+
+// ===============================
+// GUARDAR / ACTUALIZAR
+// ===============================
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    $id_consultorio  = $_POST["id_consultorio"] ?? "";
+    $nombre          = $_POST["nombre"];
+    $servicio        = $_POST["servicio"];
+    $veterinario_id  = $_POST["veterinario_id"];
+    $ubicacion       = $_POST["ubicacion"];
+    $telefono        = $_POST["telefono"];
+
+    if ($id_consultorio == "") {
+
+        $stmt = $conn->prepare(
+            "INSERT INTO consultorios (nombre, servicio, veterinario_id, ubicacion, telefono)
+             VALUES (?, ?, ?, ?, ?)"
+        );
+        $stmt->bind_param("ssiss", $nombre, $servicio, $veterinario_id, $ubicacion, $telefono);
+        $stmt->execute();
+
+    } else {
+
+        $stmt = $conn->prepare(
+            "UPDATE consultorios
+             SET nombre=?, servicio=?, veterinario_id=?, ubicacion=?, telefono=?
+             WHERE id_consultorio=?"
+        );
+        $stmt->bind_param("ssissi", $nombre, $servicio, $veterinario_id, $ubicacion, $telefono, $id_consultorio);
+        $stmt->execute();
+    }
 
     header("Location: consultorios.php");
     exit;
 }
 
+// ===============================
 // EDITAR
-if (isset($_POST['editar'])) {
-    $id     = intval($_POST['id_consultorio']);
-    $nombre = $_POST['nombre'];
-
-    $stmt = $conexion->prepare("UPDATE consultorios SET nombre=? WHERE id_consultorio=?");
-    $stmt->bind_param("si", $nombre, $id);
+// ===============================
+if (isset($_GET["editar"])) {
+    $stmt = $conn->prepare("SELECT * FROM consultorios WHERE id_consultorio=?");
+    $stmt->bind_param("i", $_GET["editar"]);
     $stmt->execute();
-    $stmt->close();
+    $row = $stmt->get_result()->fetch_assoc();
 
-    header("Location: consultorios.php");
-    exit;
+    if ($row) {
+        $id_consultorio = $row["id_consultorio"];
+        $nombre = $row["nombre"];
+        $servicio = $row["servicio"];
+        $veterinario_id = $row["veterinario_id"];
+        $ubicacion = $row["ubicacion"];
+        $telefono = $row["telefono"];
+    }
 }
 
+// ===============================
 // ELIMINAR
-if (isset($_GET['eliminar'])) {
-    $id = intval($_GET['eliminar']);
-
-    $stmt = $conexion->prepare("DELETE FROM consultorios WHERE id_consultorio=?");
-    $stmt->bind_param("i", $id);
+// ===============================
+if (isset($_GET["eliminar"])) {
+    $stmt = $conn->prepare("DELETE FROM consultorios WHERE id_consultorio=?");
+    $stmt->bind_param("i", $_GET["eliminar"]);
     $stmt->execute();
-    $stmt->close();
-
     header("Location: consultorios.php");
     exit;
 }
 
-// CONSULTA PARA FORMULARIO DE EDICIÓN
-$editar = null;
-if (isset($_GET['editar'])) {
-    $id = intval($_GET['editar']);
-    $res = $conexion->query("SELECT * FROM consultorios WHERE id_consultorio=$id LIMIT 1");
-    if ($res && $res->num_rows) $editar = $res->fetch_assoc();
-}
-
-// LISTA TABLA
-$lista = $conexion->query("SELECT * FROM consultorios ORDER BY id_consultorio");
+// ===============================
+// LISTADO CON JOIN REAL
+// ===============================
+$consultorios = $conn->query("
+    SELECT c.id_consultorio,
+           c.nombre,
+           c.servicio,
+           CONCAT(v.nombre, ' ', v.apellido) AS veterinario,
+           c.ubicacion,
+           c.telefono
+    FROM consultorios c
+    INNER JOIN veterinarios v
+        ON c.veterinario_id = v.id_veterinario
+    ORDER BY c.id_consultorio DESC
+");
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Consultorios - Veterinaria Santiago Barrera</title>
+<title>Gestión de Consultorios</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="stylos.css">
-<style>
-body { font-family: Arial, sans-serif; background:#f4f4f9; margin:0; padding:0; }
-.header { display:flex; justify-content:space-between; align-items:center; padding:10px 30px; background:#ffb703; color:white; }
-.header img { height:50px; }
-.header nav a { margin:0 10px; color:white; text-decoration:none; font-weight:bold; }
-.header nav a:hover { text-decoration:underline; }
-.contenedor { max-width:900px; margin:20px auto; padding:20px; background:white;
-    border-radius:10px; box-shadow:0 0 15px rgba(0,0,0,0.1); }
-h2 { color:#023047; text-align:center; }
-input { width:100%; padding:10px; margin:6px 0; border-radius:8px; border:1px solid #ccc; font-size:16px; }
-input:focus { border-color:#ffb703; outline:none; box-shadow:0 0 5px rgba(255,183,3,0.4);}
-.btn { padding:10px 18px; border:none; border-radius:8px; background:#ffb703; color:white; font-weight:bold;
-    cursor:pointer; margin-top:10px; transition:0.3s;}
-.btn:hover { background:#fb8500; }
-.tabla { width:100%; border-collapse: collapse; margin-top:20px; }
-.tabla th, .tabla td { border:1px solid #ddd; padding:12px; text-align:center; }
-.tabla th { background:#ffb703; color:white; }
-.fila:hover { background:#fef3d6; }
-.btn-tabla { padding:6px 10px; border-radius:5px; color:white; text-decoration:none; margin:0 5px; }
-.editar { background:#219ebc; }
-.eliminar { background:#e63946; }
-</style>
 </head>
 
 <body>
 
 <header class="header">
-    <img src="img/logo.png" alt="Logo Veterinaria">
-    <h1>Veterinaria Santiago Barrera</h1>
-    <nav>
+    <div class="header-left">
+        <img src="img/logo.png" alt="Logo">
+        <span class="header-title">Veterinaria Santiago Barrera</span>
+    </div>
+
+    <nav class="header-nav">
         <a href="index.php">Inicio</a>
         <a href="clientes.php">Clientes</a>
         <a href="mascotas.php">Mascotas</a>
-        <a href="cita.php">Citas</a>
+        <a href="citas.php">Citas</a>
         <a href="historias.php">Historias</a>
-        <a href="consultorios.php">Consultorios</a>
+        <a href="consultorios.php" class="active">Consultorios</a>
         <a href="veterinarios.php">Veterinarios</a>
         <a href="formulas.php">Fórmulas</a>
         <a href="reportes.php">Reportes</a>
     </nav>
 </header>
 
-<div class="contenedor">
-    <h2><?= $editar ? "Editar Consultorio" : "Nuevo Consultorio" ?></h2>
+<main class="container my-4">
 
-    <form method="POST">
-        <input type="hidden" name="id_consultorio" value="<?= $editar ? $editar['id_consultorio'] : '' ?>">
-
-        <input type="text" name="nombre" placeholder="Nombre del consultorio" required
-               value="<?= $editar ? htmlspecialchars($editar['nombre']) : '' ?>">
-
-        <button type="submit" name="<?= $editar ? 'editar' : 'guardar' ?>" class="btn">
-            <?= $editar ? "Actualizar" : "➕ Guardar" ?>
-        </button>
-    </form>
+<div class="title-vet">
+    <h4>Gestión de Consultorios</h4>
 </div>
 
-<div class="contenedor">
-    <h2>Lista de Consultorios</h2>
-    <table class="tabla">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Consultorio</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-        <?php while($c = $lista->fetch_assoc()): ?>
-            <tr class="fila">
-                <td><?= $c['id_consultorio'] ?></td>
-                <td><?= htmlspecialchars($c['nombre']) ?></td>
-                <td>
-                    <a href="consultorios.php?editar=<?= $c['id_consultorio'] ?>" class="btn-tabla editar">✏ Editar</a>
-                    <a href="consultorios.php?eliminar=<?= $c['id_consultorio'] ?>" class="btn-tabla eliminar"
-                       onclick="return confirm('¿Eliminar consultorio?')">🗑 Eliminar</a>
-                </td>
-            </tr>
-        <?php endwhile; ?>
-        </tbody>
-    </table>
+<div class="card mb-4 shadow-sm">
+<div class="card-body">
+
+<h6 class="mb-3">
+<?= $id_consultorio ? "Editar Consultorio" : "Registrar Consultorio"; ?>
+</h6>
+
+<form method="POST">
+<input type="hidden" name="id_consultorio" value="<?= $id_consultorio ?>">
+
+<div class="row g-3">
+
+<div class="col-md-3">
+<label class="form-label">Consultorio</label>
+<select name="nombre" class="form-select" required>
+<option value="">Seleccione</option>
+<?php foreach ($lista_consultorios as $c): ?>
+<option value="<?= $c ?>" <?= $nombre == $c ? "selected" : "" ?>>
+<?= $c ?>
+</option>
+<?php endforeach; ?>
+</select>
 </div>
 
-<div style="text-align:center; margin:20px 0;">
-    <a href="index.php" class="btn">🏠 Volver al inicio</a>
+<div class="col-md-3">
+<label class="form-label">Servicio</label>
+<select name="servicio" class="form-select" required>
+<option value="">Seleccione</option>
+<?php foreach ($lista_servicios as $s): ?>
+<option value="<?= $s ?>" <?= $servicio == $s ? "selected" : "" ?>>
+<?= $s ?>
+</option>
+<?php endforeach; ?>
+</select>
 </div>
 
-<footer style="text-align:center; padding:20px; background:#023047; color:white; margin-top:20px;">
-© 2025 Veterinaria Santiago Barrera — Todos los derechos reservados.
+<div class="col-md-3">
+<label class="form-label">Veterinario</label>
+<select name="veterinario_id" class="form-select" required>
+<option value="">Seleccione</option>
+<?php
+$veterinarios->data_seek(0);
+while ($v = $veterinarios->fetch_assoc()):
+?>
+<option value="<?= $v['id_veterinario'] ?>"
+<?= $veterinario_id == $v['id_veterinario'] ? "selected" : "" ?>>
+<?= $v['nombre_completo'] ?>
+</option>
+<?php endwhile; ?>
+</select>
+</div>
+
+<div class="col-md-3">
+<label class="form-label">Ubicación</label>
+<select name="ubicacion" class="form-select">
+<?php foreach ($lista_ubicaciones as $u): ?>
+<option value="<?= $u ?>" <?= $ubicacion == $u ? "selected" : "" ?>>
+<?= $u ?>
+</option>
+<?php endforeach; ?>
+</select>
+</div>
+
+<div class="col-md-12">
+<label class="form-label">Teléfono</label>
+<input type="text" name="telefono" class="form-control" value="<?= $telefono ?>">
+</div>
+
+</div>
+
+<div class="mt-4">
+<button class="btn btn-success">💾 Guardar</button>
+<a href="consultorios.php" class="btn btn-secondary">Cancelar</a>
+</div>
+
+</form>
+</div>
+</div>
+
+<div class="card shadow-sm">
+<div class="card-body">
+<h6 class="mb-3">📋 Lista de Consultorios</h6>
+
+<table class="table table-hover align-middle">
+<thead class="table-light">
+<tr>
+<th>ID</th>
+<th>Consultorio</th>
+<th>Servicio</th>
+<th>Veterinario</th>
+<th>Ubicación</th>
+<th>Teléfono</th>
+<th class="text-center">Acciones</th>
+</tr>
+</thead>
+<tbody>
+<?php while ($c = $consultorios->fetch_assoc()): ?>
+<tr>
+<td><?= $c["id_consultorio"] ?></td>
+<td><?= $c["nombre"] ?></td>
+<td><?= $c["servicio"] ?></td>
+<td><?= $c["veterinario"] ?></td>
+<td><?= $c["ubicacion"] ?></td>
+<td><?= $c["telefono"] ?></td>
+<td class="text-center">
+<a href="?editar=<?= $c["id_consultorio"] ?>" class="btn-action btn-edit">✏️ Editar</a>
+<a href="?eliminar=<?= $c["id_consultorio"] ?>" class="btn-action btn-delete"
+onclick="return confirm('¿Eliminar consultorio?')">🗑</a>
+</td>
+</tr>
+<?php endwhile; ?>
+</tbody>
+</table>
+</div>
+</div>
+
+</main>
+
+<footer class="footer-vet mt-auto">
+    <div class="container text-center">
+        <p class="fw-semibold mb-1">
+            🐾 Veterinaria Santiago Barrera
+        </p>
+        <p class="text-muted mb-2">
+            Cuidado profesional y amor para tus mascotas
+        </p>
+        <div class="d-flex justify-content-center gap-3 mb-2">
+            <span>🟢 WhatsApp: 317 680 1793</span>
+            <span>📸 Instagram: @santiagobarreraveterinario</span>
+        </div>
+        <small class="text-muted">
+            © 2025 Veterinaria Santiago Barrera
+        </small>
+    </div>
 </footer>
 
 </body>
 </html>
-
-
-<?php include 'includes/footer.php'; ?>
