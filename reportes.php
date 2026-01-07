@@ -1,79 +1,74 @@
-<?php include 'includes/header.php'; ?>
-
 <?php
-// reportes.php — Listado de Historias Clínicas con diseño funcional y columnas ajustadas
+// ===============================
+// CONEXIÓN BD (DIRECTA - NO TOCAR)
+// ===============================
+$conn = new mysqli("localhost", "vetsantiago", "veterinaria123", "veterinaria");
+if ($conn->connect_error) {
+    die("Error de conexión: " . $conn->connect_error);
+}
+$conn->set_charset("utf8mb4");
 
-$conexion = new mysqli("localhost", "vetsantiago", "veterinaria123", "veterinaria");
-if ($conexion->connect_errno) die("Error de conexión: " . $conexion->connect_error);
+// ===============================
+// FILTRO POR FECHAS
+// ===============================
+$fecha_inicio = $_GET['fecha_inicio'] ?? '';
+$fecha_fin    = $_GET['fecha_fin'] ?? '';
 
-// Obtener todas las historias con información de mascotas, clientes y veterinarios
-$query = "
-SELECT 
-    h.*,
-    m.nombre AS mascota_nombre,
-    c.nombre AS cliente_nombre,
-    c.apellido AS cliente_apellido,
-    v.nombre AS veterinario_nombre,
-    v.apellido AS veterinario_apellido
-FROM historias_clinicas h
-LEFT JOIN mascotas m ON h.mascota_id = m.id_mascota
-LEFT JOIN clientes c ON m.id_cliente = c.id_cliente
-LEFT JOIN veterinarios v ON h.veterinario_id = v.id_veterinario
-ORDER BY h.id DESC
-";
+$filtro_fecha = "";
+if ($fecha_inicio && $fecha_fin) {
+    $filtro_fecha = " AND c.fecha BETWEEN '$fecha_inicio' AND '$fecha_fin' ";
+}
 
-$historias = $conexion->query($query);
+// ===============================
+// MASCOTAS ATENDIDAS POR VET
+// ===============================
+$atendidas_por_vet = $conn->query("
+    SELECT 
+        v.id_veterinario,
+        v.nombre,
+        v.apellido,
+        COUNT(DISTINCT c.id_cita) AS total_atendidas
+    FROM citas c
+    JOIN veterinarios v ON c.id_veterinario = v.id_veterinario
+    WHERE c.estado = 'atendida'
+    $filtro_fecha
+    GROUP BY v.id_veterinario, v.nombre, v.apellido
+    ORDER BY total_atendidas DESC
+");
+
+// ===============================
+// MASCOTAS SIN REVISIÓN
+// ===============================
+$sin_revision = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM citas c
+    WHERE c.estado <> 'atendida'
+    $filtro_fecha
+")->fetch_assoc();
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Reportes - Historias Clínicas</title>
+<title>Reportes</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="stylos.css">
-<style>
-body { font-family: Arial, sans-serif; background:#f4f4f9; margin:0; padding:0; }
-.header { display:flex; justify-content:space-between; align-items:center; padding:10px 30px; background:#ffb703; color:white; }
-.header img { height:50px; }
-.header nav a { margin:0 10px; color:white; text-decoration:none; font-weight:bold; }
-.header nav a:hover { text-decoration:underline; }
-
-.contenedor { max-width:1200px; margin:20px auto; padding:20px; background:white; border-radius:10px; box-shadow:0 0 15px rgba(0,0,0,0.1); }
-.contenedor-tabla { overflow-x:auto; }
-
-.tabla { width:100%; border-collapse: collapse; table-layout: fixed; }
-.tabla th, .tabla td { border:1px solid #ddd; padding:10px; text-align:center; word-wrap:break-word; font-size:14px; }
-
-/* Anchos por columna */
-.tabla th.id, .tabla td.id { width:40px; }
-.tabla th.mascota, .tabla td.mascota { width:130px; }
-.tabla th.cliente, .tabla td.cliente { width:150px; }
-.tabla th.veterinario, .tabla td.veterinario { width:150px; }
-.tabla th.fecha, .tabla td.fecha { width:90px; }
-.tabla th.motivo, .tabla td.motivo { width:150px; }
-.tabla th.diagnostico, .tabla td.diagnostico { width:150px; }
-.tabla th.tratamiento, .tabla td.tratamiento { width:150px; }
-.tabla th.proximo, .tabla td.proximo { width:90px; }
-
-/* columnas secundarias numéricas más pequeñas */
-.tabla .secundaria { width:60px; }
-
-/* hover */
-.fila:hover { background:#fef3d6; }
-
-h2 { color:#023047; text-align:center; margin-top:0; }
-.btn { padding:10px 18px; border:none; border-radius:8px; background:#ffb703; color:white; font-weight:bold; cursor:pointer; margin-top:10px; transition:0.3s;}
-.btn:hover { background:#fb8500; }
-
-@media (max-width:1200px) { .tabla .secundaria { display:none; } }
-</style>
 </head>
-<body>
 
+<body class="d-flex flex-column min-vh-100">
+
+<!-- ===============================
+ HEADER
+================================ -->
 <header class="header">
-    <img src="img/logo.png" alt="Logo Veterinaria">
-    <h1>Veterinaria Santiago Barrera</h1>
-    <nav>
+    <div class="header-left">
+        <img src="img/logo.png" alt="Veterinaria Santiago Barrera">
+        <span class="header-title">Veterinaria Santiago Barrera</span>
+    </div>
+
+    <nav class="header-nav">
         <a href="index.php">Inicio</a>
         <a href="clientes.php">Clientes</a>
         <a href="mascotas.php">Mascotas</a>
@@ -82,70 +77,103 @@ h2 { color:#023047; text-align:center; margin-top:0; }
         <a href="consultorios.php">Consultorios</a>
         <a href="veterinarios.php">Veterinarios</a>
         <a href="formulas.php">Fórmulas</a>
-        <a href="reportes.php">Reportes</a>
+        <a href="reportes.php" class="active">Reportes</a>
     </nav>
 </header>
 
-<div class="contenedor">
-    <h2>Reportes de Historias Clínicas</h2>
+<!-- ===============================
+ CONTENIDO
+================================ -->
+<main class="flex-fill container my-4">
 
-    <div class="contenedor-tabla">
-    <table class="tabla">
-        <thead>
-            <tr>
-                <th class="id">ID</th>
-                <th class="mascota">Mascota</th>
-                <th class="cliente">Cliente</th>
-                <th class="veterinario">Veterinario</th>
-                <th class="fecha">Fecha</th>
-                <th class="motivo">Motivo</th>
-                <th class="diagnostico">Diagnóstico</th>
-                <th class="tratamiento">Tratamiento</th>
-                <th class="secundaria">Peso</th>
-                <th class="secundaria">Temp</th>
-                <th class="secundaria">FC</th>
-                <th class="secundaria">FR</th>
-                <th class="secundaria">Estado de ánimo</th>
-                <th class="secundaria">Observaciones</th>
-                <th class="proximo">Próximo Control</th>
-            </tr>
-        </thead>
-        <tbody>
-        <?php while($h = $historias->fetch_assoc()): ?>
-            <tr class="fila">
-                <td class="id"><?= htmlspecialchars($h['id'] ?? '') ?></td>
-                <td class="mascota"><?= htmlspecialchars($h['mascota_nombre'] ?? '') ?></td>
-                <td class="cliente"><?= htmlspecialchars(($h['cliente_nombre'] ?? '').' '.($h['cliente_apellido'] ?? '')) ?></td>
-                <td class="veterinario"><?= htmlspecialchars(($h['veterinario_nombre'] ?? '').' '.($h['veterinario_apellido'] ?? '')) ?></td>
-                <td class="fecha"><?= htmlspecialchars($h['fecha'] ?? '') ?></td>
-                <td class="motivo"><?= htmlspecialchars($h['motivo'] ?? '') ?></td>
-                <td class="diagnostico"><?= htmlspecialchars($h['diagnostico'] ?? '') ?></td>
-                <td class="tratamiento"><?= htmlspecialchars($h['tratamiento'] ?? '') ?></td>
-                <td class="secundaria"><?= htmlspecialchars($h['peso'] ?? '') ?></td>
-                <td class="secundaria"><?= htmlspecialchars($h['temperatura'] ?? '') ?></td>
-                <td class="secundaria"><?= htmlspecialchars($h['frecuencia_cardiaca'] ?? '') ?></td>
-                <td class="secundaria"><?= htmlspecialchars($h['frecuencia_respiratoria'] ?? '') ?></td>
-                <td class="secundaria"><?= htmlspecialchars($h['estado_animo'] ?? '') ?></td>
-                <td class="secundaria"><?= htmlspecialchars($h['observaciones'] ?? '') ?></td>
-                <td class="proximo"><?= htmlspecialchars($h['proximo_control'] ?? '') ?></td>
-            </tr>
-        <?php endwhile; ?>
-        </tbody>
-    </table>
+<div class="title-vet mb-4">
+    <h4>📊 Reportes Generales</h4>
+</div>
+
+<!-- FILTRO FECHA -->
+<div class="card mb-4 shadow-sm">
+<div class="card-body">
+<h6 class="mb-3">📅 Filtro por rango de fechas</h6>
+
+<form method="GET" class="row g-3">
+    <div class="col-md-4">
+        <label class="form-label">Desde</label>
+        <input type="date" name="fecha_inicio" class="form-control" value="<?= htmlspecialchars($fecha_inicio) ?>">
     </div>
+    <div class="col-md-4">
+        <label class="form-label">Hasta</label>
+        <input type="date" name="fecha_fin" class="form-control" value="<?= htmlspecialchars($fecha_fin) ?>">
+    </div>
+    <div class="col-md-4 d-flex align-items-end gap-2">
+        <button class="btn btn-primary">Filtrar</button>
+        <a href="reportes.php" class="btn btn-secondary">Limpiar</a>
+    </div>
+</form>
+</div>
 </div>
 
-<div class="volver" style="text-align:center; margin:20px 0;">
-    <a href="index.php" class="btn">🏠 Volver al inicio</a>
+<!-- ATENDIDAS POR VET -->
+<div class="card mb-4 shadow-sm">
+<div class="card-body">
+<h6 class="mb-3">👨‍⚕️ Mascotas atendidas por veterinario</h6>
+
+<table class="table table-hover align-middle">
+<thead class="table-light">
+<tr>
+    <th>Veterinario</th>
+    <th>Total atendidas</th>
+</tr>
+</thead>
+<tbody>
+<?php if ($atendidas_por_vet && $atendidas_por_vet->num_rows > 0): ?>
+    <?php while ($r = $atendidas_por_vet->fetch_assoc()): ?>
+    <tr>
+        <td><?= htmlspecialchars($r['nombre'].' '.$r['apellido']) ?></td>
+        <td class="fw-bold"><?= $r['total_atendidas'] ?></td>
+    </tr>
+    <?php endwhile; ?>
+<?php else: ?>
+    <tr>
+        <td colspan="2" class="text-center text-muted">
+            No hay datos para el rango seleccionado
+        </td>
+    </tr>
+<?php endif; ?>
+</tbody>
+</table>
+</div>
 </div>
 
-<footer style="text-align:center; padding:20px; background:#023047; color:white; margin-top:20px; border-radius:0 0 10px 10px;">
-© 2025 Veterinaria Santiago Barrera — Todos los derechos reservados.<br>
-🟢 WhatsApp 3176801793 | @santiagobarreraveterinario
+<!-- SIN REVISION -->
+<div class="card shadow-sm">
+<div class="card-body">
+<h6 class="mb-3">⚠️ Mascotas sin revisión</h6>
+
+<p class="fs-5">
+Total:
+<span class="fw-bold text-danger">
+<?= $sin_revision['total'] ?? 0 ?>
+</span>
+</p>
+</div>
+</div>
+
+</main>
+
+<!-- ===============================
+ FOOTER OFICIAL (NO TOCADO)
+================================ -->
+<footer class="footer-vet mt-auto">
+<div class="container text-center">
+<p class="fw-semibold mb-1">🐾 Veterinaria Santiago Barrera</p>
+<p class="text-muted mb-2">Cuidado profesional y amor para tus mascotas</p>
+<div class="d-flex justify-content-center gap-3 mb-2">
+<span>🟢 WhatsApp: 317 680 1793</span>
+<span>📸 Instagram: @santiagobarreraveterinario</span>
+</div>
+<small class="text-muted">© 2025 Veterinaria Santiago Barrera — Todos los derechos reservados</small>
+</div>
 </footer>
 
 </body>
 </html>
-
-
-<?php include 'includes/footer.php'; ?>
